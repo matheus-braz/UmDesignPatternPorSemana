@@ -9,21 +9,28 @@ namespace Evitando.Duplicacao.de.Codigo.Exercicios
 
     // Entidades
 
-    public class SamGuia : Entidade<SamGuia>
+    public interface IAutorizacao
+    {
+        string NumeroGuia { get; set; }
+        string ProfissionalExecutante { get; set; }
+        string Beneficiario { get; set; }
+    }
+
+    public class SamGuia : Entidade<SamGuia>, IAutorizacao
     {
         public string NumeroGuia { get; set; }
         public string ProfissionalExecutante { get; set; }
         public string Beneficiario { get; set; }
     }
 
-    public class SamAutoriz : Entidade<SamAutoriz>
+    public class SamAutoriz : Entidade<SamAutoriz>, IAutorizacao
     {
         public string NumeroGuia { get; set; }
         public string ProfissionalExecutante { get; set; }
         public string Beneficiario { get; set; }
     }
 
-    public class WebAutoriz : Entidade<SamAutoriz>
+    public class WebAutoriz : Entidade<SamAutoriz>, IAutorizacao
     {
         public string NumeroGuia { get; set; }
         public string ProfissionalExecutante { get; set; }
@@ -31,13 +38,10 @@ namespace Evitando.Duplicacao.de.Codigo.Exercicios
     }
 
     // Serviços
-
-    public class ConsultaGuias
+    public class ServicoGuiaConsulta
     {
-        public ctm_consultaGuia ConsultarGuia(long handle)
+        public ctm_consultaGuia Consulta(IAutorizacao guia)
         {
-            var guia = SamGuia.Get(handle);
-
             return new ctm_consultaGuia
             {
                 numeroGuiaOperadora = guia.NumeroGuia,
@@ -50,6 +54,18 @@ namespace Evitando.Duplicacao.de.Codigo.Exercicios
                     nomeProfissional = guia.ProfissionalExecutante
                 }
             };
+        }
+    }
+
+
+    public class ConsultaGuias
+    {
+        public ctm_consultaGuia ConsultarGuia(long handle)
+        {
+            var guia = SamGuia.Get(handle);
+            var consulta = new ServicoGuiaConsulta().Consulta(guia);
+
+            return consulta;
         }
     }
 
@@ -58,19 +74,9 @@ namespace Evitando.Duplicacao.de.Codigo.Exercicios
         public ctm_consultaGuia ConsultarAutorizacao(long handle)
         {
             var guia = SamAutoriz.Get(handle);
+            var consulta = new ServicoGuiaConsulta().Consulta(guia);
 
-            return new ctm_consultaGuia
-            {
-                numeroGuiaOperadora = guia.NumeroGuia,
-                dadosBeneficiario = new ct_beneficiarioDados
-                {
-                    nomeBeneficiario = guia.Beneficiario
-                },
-                profissionalExecutante = new ct_contratadoProfissionalDados
-                {
-                    nomeProfissional = guia.ProfissionalExecutante
-                }
-            };
+            return consulta;
         }
     }
 
@@ -79,19 +85,9 @@ namespace Evitando.Duplicacao.de.Codigo.Exercicios
         public ctm_consultaGuia ConsultarAutorizacaoWeb(long handle)
         {
             var guia = WebAutoriz.Get(handle);
+            var consulta = new ServicoGuiaConsulta().Consulta(guia);
 
-            return new ctm_consultaGuia
-            {
-                numeroGuiaOperadora = guia.NumeroGuia,
-                dadosBeneficiario = new ct_beneficiarioDados
-                {
-                    nomeBeneficiario = guia.Beneficiario
-                },
-                profissionalExecutante = new ct_contratadoProfissionalDados
-                {
-                    nomeProfissional = guia.ProfissionalExecutante
-                }
-            };
+            return consulta;
         }
     }
 }
